@@ -4,7 +4,9 @@ const humidityRef = document.querySelector(".humidity");
 const windRef = document.querySelector(".wind");
 const searchBtnRef = document.querySelector(".search button");
 const searchBoxRef = document.querySelector(".search input");
-const weatherImgRef = document.querySelector(".weather-icon")
+const weatherImgRef = document.querySelector(".weather-icon");
+const divWeatherRef = document.querySelector(".weather");
+const errorRef = document.querySelector(".error");
 
 searchBtnRef.addEventListener("click", onSearch);
 
@@ -13,19 +15,26 @@ const url = "https://api.openweathermap.org/data/2.5/weather?&units=metric&q=";
 
 async function weatherCheck(city) {
     const response = await fetch(url + city + `&appid=${key}`);
-    const data = await response.json();
 
-    tempRef.textContent = `${Math.round(data.main.temp) + "°C"}`;
-    cityRef.textContent = data.name;
-    humidityRef.textContent = `${data.main.humidity + "%"}`;
-    windRef.textContent = `${data.wind.speed + " km/h"}`;
-    weatherImgRef.src = weatherIcon(data.weather[0].main)
+    if(response.status == 404) {
+        errorRef.style.display = "block";
+        divWeatherRef.style.display = "none";
 
-    console.log(data.weather[0].main);
+    } else {
+        const data = await response.json();
+
+        tempRef.textContent = `${Math.round(data.main.temp) + "°C"}`;
+        cityRef.textContent = data.name;
+        humidityRef.textContent = `${data.main.humidity + "%"}`;
+        windRef.textContent = `${data.wind.speed + " km/h"}`;
+        weatherImgRef.src = weatherIcon(data.weather[0].main)
+    }
 }
 
 function onSearch(event) {
     weatherCheck(searchBoxRef.value);
+    divWeatherRef.style.display = "block"
+    errorRef.style.display = "none";
     searchBoxRef.value = "";
 }
 
